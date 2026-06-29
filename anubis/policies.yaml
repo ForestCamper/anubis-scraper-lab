@@ -1,0 +1,76 @@
+# Bot policy configuration for Anubis
+# See: https://anubis.techaro.lol/docs/admin/policies
+
+bots:
+  # # Allow well-known paths without challenge
+  # - name: well-known
+  #   path_regex: ^/.well-known/.*$
+  #   action: ALLOW
+
+  # # Allow favicon requests
+  # - name: favicon
+  #   path_regex: ^/favicon.ico$
+  #   action: ALLOW
+
+  # Allow robots.txt
+  - name: robots-txt
+    path_regex: ^/robots.txt$
+    action: ALLOW
+
+  # # Allow health check endpoints
+  # - name: health-checks
+  #   path_regex: ^/(health|healthz|ready|readyz)$
+  #   action: ALLOW
+
+  # # Deny known AI scrapers
+  # - name: amazonbot
+  #   user_agent_regex: Amazonbot
+  #   action: DENY
+
+  # - name: gptbot
+  #   user_agent_regex: GPTBot
+  #   action: DENY
+
+  # - name: claudebot
+  #   user_agent_regex: ClaudeBot|Claude-Web
+  #   action: DENY
+
+  # - name: bytespider
+  #   user_agent_regex: Bytespider
+  #   action: DENY
+
+  # - name: ccbot
+  #   user_agent_regex: CCBot
+  #   action: DENY
+
+  # # Allow Internet Archive
+  # - name: internet-archive
+  #   user_agent_regex: archive\.org_bot|ia_archiver
+  #   action: ALLOW
+
+  # # Challenge browser-like clients
+  # - name: generic-browser
+  #   user_agent_regex: Mozilla
+  #   action: CHALLENGE
+
+  # Default policy: challenge all other clients
+  - name: default
+    path_regex: .*
+    action: CHALLENGE
+    challenge:
+      difficulty: 4
+      algorithm: fast
+
+# Storage configuration for challenge data.
+# In-memory store: the Anubis image is distroless and runs as non-root (uid 1000),
+# so it cannot create/own a writable /data dir for bbolt at build time. For this
+# ephemeral test range, persistence isn't needed. To use bbolt instead, mount a
+# host-writable volume at /data (owned by 1000) and set backend: bbolt with
+# parameters.path: /data/anubis.bdb.
+store:
+  backend: memory
+
+# Logging configuration
+logging:
+  sink: stdio
+  level: INFO

@@ -1,0 +1,67 @@
+services:
+  # ---- anubis: the proof-of-work anti-bot proxy, the only public entry point ----
+  anubis:
+    build: ./anubis            # custom Dockerfile bakes policies.yaml into the image
+    image: anubis-scraper-lab-anubis
+    container_name: anubis-scraper-lab-anubis
+    environment:
+      BIND: ":8923"
+      TARGET: "http://range:8000"          # proxy upstream = the range service
+      DIFFICULTY: "4"                       # PoW difficulty (leading zero nibbles)
+      USE_REMOTE_ADDRESS: "true"           # no upstream proxy sets X-Real-Ip, so use the TCP peer
+      # Served over plain HTTP, so cookies must NOT be marked Secure — browsers
+      # discard Secure cookies on http:// origins, which loops the challenge
+      # forever. With this false, SameSite=None auto-downgrades to Lax.
+      COOKIE_SECURE: "false"
+      # Clearance-cookie lifetime. At "1s" the cookie expires before the crawler
+      # reaches the next page, so EVERY request re-runs the PoW — simulating
+      # stateless, high-volume scraping. Comment this out (default 168h) for the
+      # realistic "one PoW per session" behavior where a crawl amortizes one solve.
+      COOKIE_EXPIRATION_TIME: "1s"
+      METRICS_BIND: ":9090"
+      SERVE_ROBOTS_TXT: "true"
+      POLICY_FNAME: "/etc/anubis/policies.yaml"
+      # Throwaway signing key for this local lab — NOT a secret. Regenerate with
+      # `openssl rand -hex 32` if you prefer.
+      ED25519_PRIVATE_KEY_HEX: "09cbb634f8d1316cb0316059dd0fe8c39b1da760866d643e8999a92d0cbfa519"
+    ports:
+      - "8000:8923"            # browse the protected site at http://localhost:8000/index.html
+    healthcheck:
+      test: ["CMD", "anubis", "--healthcheck"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 2s
+    restart: unless-stopped
+    depends_on:
+      range:
+        condition: service_healthy
+
+  # ---- range: the mock target website (the "extraction range") -----------------
+  # Internal only: reachable on the compose network, never published to the host,
+  # so all traffic must go through Anubis.
+  range:
+    build: ./range
+    image: anubis-scraper-lab-range
+    container_name: anubis-scraper-lab-range
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/index.html').read()"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+      start_period: 2s
+
+  # ---- scrapers: the three crawlers, driven through Anubis ----------------------
+  scrapers:
+    build: ./scrapers
+    image: anubis-scraper-lab-scrapers
+    container_name: anubis-scraper-lab-scrapers
+    depends_on:
+      anubis:
+        condition: service_healthy
+    environment:
+      SEED_URL: "http://anubis:8923/index.html"   # crawl through Anubis, not around it
+      OCR: "0"                                     # set to 1 to enable the tesseract pass
+    shm_size: "1gb"            # headless Chromium needs the shared memory

@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Extraction Range — a scraper proving ground</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <span class="mark">THE&nbsp;EXTRACTION&nbsp;<b>RANGE</b></span>
+  <nav>46 specimens</nav>
+</div></header>
+<section class="hero"><div class="wrap">
+  <p class="eyebrow">scraper proving ground · v1</p>
+  <h1>Every place a page<br><span class="thin">can hide a</span> value.</h1>
+  <p class="lede">A catalogue of 46 storage and embedding techniques — from plain text and
+  framesets to shadow DOM, canvas pixels, and response headers. Each specimen buries one
+  <span class="mono" style="color:var(--accent)">FLAG{…}</span> using exactly one technique.
+  If your scraper recovers the flag, it can read data stored that way.</p>
+  <div class="counts">
+    <div><b>46</b><span>specimens</span></div>
+    <div><b>28</b><span>modern</span></div>
+    <div><b>18</b><span>legacy</span></div>
+    <div><b>9</b><span>need server</span></div>
+  </div>
+  <div class="legend">
+    <span><span class="dot modern"></span>modern technique</span>
+    <span><span class="dot legacy"></span>legacy technique</span>
+    <span class="mono">▣▣▣□□ = scrape difficulty (1–5)</span>
+    <span><span class="srv">needs server</span> = run serve.py (storage / fetch / headers)</span>
+  </div>
+</div></section>
+<main class="wrap">
+<section class="cat">
+  <h2>DOM-visible</h2>
+  <p class="cat-sub">value sits in a visible text node or table · 5 specimens</p>
+  <div class="grid"><a class="card" href="pages/plain-text.html">
+  <span class="id"><span>SPX-001</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣□□□□</span></span>
+  <div class="nm">Plain DOM text</div>
+  <p class="how">The value is an ordinary text node in the HTML. Any innerText read or HTML-to-text pass returns it — the baseline every scraper handles.</p>
+  <div class="loc"><b>flag lives in</b><br>Visible text inside a &lt;p&gt;.</div>
+</a>
+<a class="card" href="pages/html-table.html">
+  <span class="id"><span>SPX-002</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣□□□□</span></span>
+  <div class="nm">Table cell</div>
+  <p class="how">Data is laid out in a <code>&lt;table&gt;</code> and the value is one <code>&lt;td&gt;</code>. Parse rows and columns, then read the cell by its row label.</p>
+  <div class="loc"><b>flag lives in</b><br>A &lt;td&gt; in the access-token row.</div>
+</a>
+<a class="card" href="pages/nested-list.html">
+  <span class="id"><span>SPX-003</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣□□□□</span></span>
+  <div class="nm">Deeply nested list</div>
+  <p class="how">The value is a leaf buried in nested <code>&lt;ul&gt;/&lt;li&gt;</code> elements. It's plain text, but a selector that only reads top-level items walks right past it.</p>
+  <div class="loc"><b>flag lives in</b><br>Leaf &lt;li&gt; nested four levels deep.</div>
+</a>
+<a class="card" href="pages/definition-list.html">
+  <span class="id"><span>SPX-004</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣□□□□</span></span>
+  <div class="nm">Definition list</div>
+  <p class="how">A <code>&lt;dl&gt;</code> pairs <code>&lt;dt&gt;</code> terms with <code>&lt;dd&gt;</code> descriptions. Read the <code>&lt;dd&gt;</code> that follows the matching term.</p>
+  <div class="loc"><b>flag lives in</b><br>The &lt;dd&gt; following the access-token &lt;dt&gt;.</div>
+</a>
+<a class="card" href="pages/svg-text.html">
+  <span class="id"><span>SPX-005</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">SVG &lt;text&gt; node</div>
+  <p class="how">Inline SVG <code>&lt;text&gt;</code> nodes are real, selectable DOM text — not pixels — so they're readable directly with no image processing.</p>
+  <div class="loc"><b>flag lives in</b><br>A &lt;text&gt; element inside inline SVG.</div>
+</a></div>
+</section><section class="cat">
+  <h2>Attributes &amp; metadata</h2>
+  <p class="cat-sub">value rides in attributes, meta tags, or hidden inputs · 7 specimens</p>
+  <div class="grid"><a class="card" href="pages/data-attribute.html">
+  <span class="id"><span>SPX-006</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">data-* attribute</div>
+  <p class="how">HTML5 <code>data-*</code> attributes carry machine-readable values that never render on screen. Read the attribute straight off the element.</p>
+  <div class="loc"><b>flag lives in</b><br>data-access-token attribute on .widget.</div>
+</a>
+<a class="card" href="pages/title-alt.html">
+  <span class="id"><span>SPX-007</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">title / alt attribute</div>
+  <p class="how"><code>title</code> (tooltip) and image <code>alt</code> (alternative text) attributes hold strings shown only on hover or to assistive tech, yet always sit in the markup.</p>
+  <div class="loc"><b>flag lives in</b><br>title attribute and img alt text.</div>
+</a>
+<a class="card" href="pages/aria-label.html">
+  <span class="id"><span>SPX-008</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">ARIA label</div>
+  <p class="how">Accessibility attributes like <code>aria-label</code> describe controls for screen readers. They live in the DOM, so reading the attribute reveals the value.</p>
+  <div class="loc"><b>flag lives in</b><br>aria-label on a &lt;button&gt;.</div>
+</a>
+<a class="card" href="pages/meta-tags.html">
+  <span class="id"><span>SPX-009</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">Meta tags &amp; Open Graph</div>
+  <p class="how">Tags in <code>&lt;head&gt;</code> — description, Open Graph, Twitter cards — carry metadata invisible in the page body. Parse the head and read the content.</p>
+  <div class="loc"><b>flag lives in</b><br>&lt;meta name=x-access-token&gt; in &lt;head&gt;.</div>
+</a>
+<a class="card" href="pages/hidden-input.html">
+  <span class="id"><span>SPX-010</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">Hidden form field</div>
+  <p class="how">Forms ship <code>&lt;input type=hidden&gt;</code> fields (CSRF tokens, ids). Nothing renders, but the value is in the <code>value</code> attribute.</p>
+  <div class="loc"><b>flag lives in</b><br>value of input[type=hidden].</div>
+</a>
+<a class="card" href="pages/value-placeholder.html">
+  <span class="id"><span>SPX-011</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">Pre-filled input value</div>
+  <p class="how">A control can arrive with its value already populated in markup. Read the <code>value</code> attribute, not the rendered text.</p>
+  <div class="loc"><b>flag lives in</b><br>value attribute on a readonly input.</div>
+</a>
+<a class="card" href="pages/link-href.html">
+  <span class="id"><span>SPX-012</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">URL in href / query string</div>
+  <p class="how">Values ride inside link URLs as query-string parameters. Parse the <code>href</code> and pull the parameter.</p>
+  <div class="loc"><b>flag lives in</b><br>access_token query param in an &lt;a href&gt;.</div>
+</a></div>
+</section><section class="cat">
+  <h2>Structured data</h2>
+  <p class="cat-sub">machine-readable islands: JSON-LD, microdata, RDFa, hydration blobs · 4 specimens</p>
+  <div class="grid"><a class="card" href="pages/json-ld.html">
+  <span class="id"><span>SPX-013</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣□□</span></span>
+  <div class="nm">JSON-LD structured data</div>
+  <p class="how">A <code>&lt;script type=application/ld+json&gt;</code> block holds a schema.org JSON object (the same data search engines read). Parse the JSON and read the field.</p>
+  <div class="loc"><b>flag lives in</b><br>identifier field in JSON-LD.</div>
+</a>
+<a class="card" href="pages/microdata.html">
+  <span class="id"><span>SPX-014</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣□□</span></span>
+  <div class="nm">Microdata (itemprop)</div>
+  <p class="how">Schema.org microdata annotates elements with <code>itemprop</code> attributes; the value is one property, sometimes carried by a <code>&lt;meta itemprop&gt;</code>.</p>
+  <div class="loc"><b>flag lives in</b><br>itemprop=sku via &lt;meta&gt;.</div>
+</a>
+<a class="card" href="pages/rdfa.html">
+  <span class="id"><span>SPX-015</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣□□</span></span>
+  <div class="nm">RDFa annotations</div>
+  <p class="how">RDFa embeds semantic triples in <code>property</code>/<code>typeof</code> attributes. Read the relevant <code>property</code> to recover the value.</p>
+  <div class="loc"><b>flag lives in</b><br>property=identifier via &lt;meta&gt;.</div>
+</a>
+<a class="card" href="pages/embedded-json.html">
+  <span class="id"><span>SPX-016</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣□□</span></span>
+  <div class="nm">Embedded JSON island</div>
+  <p class="how">SPAs serialise their state into a JSON island (e.g. Next.js <code>__NEXT_DATA__</code>) for client hydration. Parse the script's JSON and drill into the object.</p>
+  <div class="loc"><b>flag lives in</b><br>accessToken inside script#__APP_DATA__.</div>
+</a></div>
+</section><section class="cat">
+  <h2>CSS-driven</h2>
+  <p class="cat-sub">value hidden or rendered purely through stylesheets · 5 specimens</p>
+  <div class="grid"><a class="card" href="pages/css-display-none.html">
+  <span class="id"><span>SPX-017</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">CSS display:none</div>
+  <p class="how">The element is fully present in the DOM; CSS just sets <code>display:none</code>. Read the element's text instead of trusting what's visible.</p>
+  <div class="loc"><b>flag lives in</b><br>Text of #vault (display:none).</div>
+</a>
+<a class="card" href="pages/css-offscreen.html">
+  <span class="id"><span>SPX-018</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">Off-screen positioning</div>
+  <p class="how">Absolute positioning (<code>left:-9999px</code>) shoves the node off-screen, but it's still in the DOM — read its text directly.</p>
+  <div class="loc"><b>flag lives in</b><br>Text of .offscreen span.</div>
+</a>
+<a class="card" href="pages/css-pseudo.html">
+  <span class="id"><span>SPX-019</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣▣□</span></span>
+  <div class="nm">CSS ::after content</div>
+  <p class="how">The string exists only in a stylesheet's <code>::after { content }</code>, never in the HTML body. Read computed styles or parse the CSS.</p>
+  <div class="loc"><b>flag lives in</b><br>::after content of #chip in &lt;style&gt;.</div>
+</a>
+<a class="card" href="pages/css-attr.html">
+  <span class="id"><span>SPX-020</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣□□</span></span>
+  <div class="nm">CSS content:attr()</div>
+  <p class="how">CSS prints a data-attribute on screen via <code>content:attr()</code>. The real source is the attribute; CSS just surfaces it visually.</p>
+  <div class="loc"><b>flag lives in</b><br>data-token surfaced by content:attr().</div>
+</a>
+<a class="card" href="pages/css-variable.html">
+  <span class="id"><span>SPX-021</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣▣□</span></span>
+  <div class="nm">CSS custom property</div>
+  <p class="how">The value is a CSS custom property (<code>--x</code>) rendered through <code>content:var()</code>. Parse the stylesheet or read computed styles.</p>
+  <div class="loc"><b>flag lives in</b><br>--access custom property in :root.</div>
+</a></div>
+</section><section class="cat">
+  <h2>Script &amp; dynamic</h2>
+  <p class="cat-sub">requires executing JavaScript or reading browser storage · 8 specimens</p>
+  <div class="grid"><a class="card" href="pages/inline-js-var.html">
+  <span class="id"><span>SPX-022</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣□□</span></span>
+  <div class="nm">Inline JS global</div>
+  <p class="how">An inline <code>&lt;script&gt;</code> assigns the value to a <code>window</code> global. Execute the JS — or regex the script — to read it.</p>
+  <div class="loc"><b>flag lives in</b><br>window.__APP_STATE__.session.accessToken.</div>
+</a>
+<a class="card" href="pages/js-rendered.html">
+  <span class="id"><span>SPX-023</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣▣□</span></span>
+  <div class="nm">JS-rendered DOM</div>
+  <p class="how">JavaScript writes the value into the DOM after load, so a raw-HTML fetch sees only a placeholder. You need a JS-executing (headless) browser.</p>
+  <div class="loc"><b>flag lives in</b><br>#slot textContent after JS runs.</div>
+</a>
+<a class="card" href="pages/ajax-fetch.html">
+  <span class="id"><span>SPX-024</span><span class="era modern">Modern</span><span class="srv">needs server</span>
+    <span class="meter">▣▣▣▣□</span></span>
+  <div class="nm">AJAX / fetch endpoint</div>
+  <p class="how">Content arrives in a second request (fetch/XHR) after the page loads. Execute JS and wait, or call the JSON endpoint directly.</p>
+  <div class="loc"><b>flag lives in</b><br>session.accessToken in assets/ajax-data.json.</div>
+</a>
+<a class="card" href="pages/localstorage.html">
+  <span class="id"><span>SPX-025</span><span class="era modern">Modern</span><span class="srv">needs server</span>
+    <span class="meter">▣▣▣▣□</span></span>
+  <div class="nm">localStorage</div>
+  <p class="how">Script stashes the value in <code>localStorage</code>, which never appears in the served HTML. Read it from a real browser context.</p>
+  <div class="loc"><b>flag lives in</b><br>localStorage key &#x27;access_token&#x27;.</div>
+</a>
+<a class="card" href="pages/sessionstorage.html">
+  <span class="id"><span>SPX-026</span><span class="era modern">Modern</span><span class="srv">needs server</span>
+    <span class="meter">▣▣▣▣□</span></span>
+  <div class="nm">sessionStorage</div>
+  <p class="how">Like localStorage but scoped to the tab. The script writes it at load; it lives only in the browser's session store.</p>
+  <div class="loc"><b>flag lives in</b><br>sessionStorage key &#x27;session_token&#x27;.</div>
+</a>
+<a class="card" href="pages/cookie.html">
+  <span class="id"><span>SPX-027</span><span class="era legacy">Legacy</span><span class="srv">needs server</span>
+    <span class="meter">▣▣▣▣□</span></span>
+  <div class="nm">Client-set cookie</div>
+  <p class="how">A client-side cookie holds the value (<code>document.cookie</code>). Read the cookie jar from a browser context.</p>
+  <div class="loc"><b>flag lives in</b><br>document.cookie key &#x27;access_token&#x27;.</div>
+</a>
+<a class="card" href="pages/indexeddb.html">
+  <span class="id"><span>SPX-028</span><span class="era modern">Modern</span><span class="srv">needs server</span>
+    <span class="meter">▣▣▣▣▣</span></span>
+  <div class="nm">IndexedDB</div>
+  <p class="how">The value sits in a client-side database (IndexedDB) object store, not the DOM. Open the database and read the key.</p>
+  <div class="loc"><b>flag lives in</b><br>range_db → kv → &#x27;access_token&#x27;.</div>
+</a>
+<a class="card" href="pages/canvas.html">
+  <span class="id"><span>SPX-029</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣▣▣</span></span>
+  <div class="nm">Canvas-painted text</div>
+  <p class="how">Text is painted as pixels onto a <code>&lt;canvas&gt;</code>, so no text node exists. Intercept the draw calls or OCR the rendered bitmap.</p>
+  <div class="loc"><b>flag lives in</b><br>fillText() call drawing onto #cv.</div>
+</a></div>
+</section><section class="cat">
+  <h2>Encoded &amp; embedded</h2>
+  <p class="cat-sub">value is encoded, commented, or inlined as a resource · 5 specimens</p>
+  <div class="grid"><a class="card" href="pages/base64.html">
+  <span class="id"><span>SPX-030</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣□□</span></span>
+  <div class="nm">Base64-encoded value</div>
+  <p class="how">The value is base64-encoded inside an attribute/script. Decode it to recover the original string.</p>
+  <div class="loc"><b>flag lives in</b><br>base64 in data-payload (decode it).</div>
+</a>
+<a class="card" href="pages/html-entities.html">
+  <span class="id"><span>SPX-031</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">HTML entity encoding</div>
+  <p class="how">Every character is a numeric HTML entity (<code>&amp;#NN;</code>). The parser decodes them automatically, so correct parsing yields the value.</p>
+  <div class="loc"><b>flag lives in</b><br>Numeric character references in a &lt;code&gt;.</div>
+</a>
+<a class="card" href="pages/data-uri.html">
+  <span class="id"><span>SPX-032</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣□□</span></span>
+  <div class="nm">data: URI payload</div>
+  <p class="how">A whole resource is inlined as a <code>data:</code> URI. Decode its base64 body to read the value inside.</p>
+  <div class="loc"><b>flag lives in</b><br>base64 body of a data:text/plain URI.</div>
+</a>
+<a class="card" href="pages/comment.html">
+  <span class="id"><span>SPX-033</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">HTML comment</div>
+  <p class="how">The value lives in an HTML comment. The rendered DOM drops comments, but a raw-source scan still sees them.</p>
+  <div class="loc"><b>flag lives in</b><br>Inside an HTML &lt;!-- comment --&gt;.</div>
+</a>
+<a class="card" href="pages/noscript.html">
+  <span class="id"><span>SPX-034</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">noscript fallback</div>
+  <p class="how">The no-JavaScript fallback inside <code>&lt;noscript&gt;</code> is always present in the source, even when JS is enabled.</p>
+  <div class="loc"><b>flag lives in</b><br>Text inside &lt;noscript&gt;.</div>
+</a></div>
+</section><section class="cat">
+  <h2>Embedded &amp; components</h2>
+  <p class="cat-sub">separate documents, shadow trees, media, and pixels · 5 specimens</p>
+  <div class="grid"><a class="card" href="pages/iframe.html">
+  <span class="id"><span>SPX-035</span><span class="era modern">Modern</span><span class="srv">needs server</span>
+    <span class="meter">▣▣▣□□</span></span>
+  <div class="nm">Nested iframe</div>
+  <p class="how">The value lives in a separate document embedded via <code>&lt;iframe&gt;</code>. Follow the <code>src</code> or read <code>contentDocument</code>.</p>
+  <div class="loc"><b>flag lives in</b><br>Inside pages/iframe-inner.html.</div>
+</a>
+<a class="card" href="pages/shadow-dom.html">
+  <span class="id"><span>SPX-036</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣▣▣</span></span>
+  <div class="nm">Shadow DOM</div>
+  <p class="how">Content is encapsulated in a shadow root, hidden from ordinary DOM queries. Pierce it via <code>host.shadowRoot</code>.</p>
+  <div class="loc"><b>flag lives in</b><br>#host.shadowRoot text.</div>
+</a>
+<a class="card" href="pages/web-component.html">
+  <span class="id"><span>SPX-037</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣▣□</span></span>
+  <div class="nm">Custom element</div>
+  <p class="how">A registered custom element renders the value from one of its attributes (or in <code>connectedCallback</code>). Read the attribute or run the JS.</p>
+  <div class="loc"><b>flag lives in</b><br>token attribute of &lt;range-badge&gt;.</div>
+</a>
+<a class="card" href="pages/webvtt.html">
+  <span class="id"><span>SPX-038</span><span class="era modern">Modern</span><span class="srv">needs server</span>
+    <span class="meter">▣▣▣▣□</span></span>
+  <div class="nm">WebVTT captions</div>
+  <p class="how">Caption/subtitle text lives in a sidecar <code>.vtt</code> track file. Fetch the track and read the cue text.</p>
+  <div class="loc"><b>flag lives in</b><br>Cue text in assets/captions.vtt.</div>
+</a>
+<a class="card" href="pages/image-ocr.html">
+  <span class="id"><span>SPX-039</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣▣▣▣▣</span></span>
+  <div class="nm">Text inside an image (OCR)</div>
+  <p class="how">The value is rasterised into image pixels with no alt text. Only optical character recognition (OCR) recovers it.</p>
+  <div class="loc"><b>flag lives in</b><br>Pixels of assets/ocr.png (OCR needed).</div>
+</a></div>
+</section><section class="cat">
+  <h2>Legacy techniques</h2>
+  <p class="cat-sub">framesets, marquees, IE conditional comments · 3 specimens</p>
+  <div class="grid"><a class="card" href="pages/frameset.html">
+  <span class="id"><span>SPX-040</span><span class="era legacy">Legacy</span><span class="srv">needs server</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">HTML frameset (legacy)</div>
+  <p class="how">A legacy <code>&lt;frameset&gt;</code> splits the window into <code>&lt;frame&gt;</code> documents; the value is in one frame (and the <code>&lt;noframes&gt;</code> fallback).</p>
+  <div class="loc"><b>flag lives in</b><br>frameset-b.html (and &lt;noframes&gt;)</div>
+</a>
+<a class="card" href="pages/marquee.html">
+  <span class="id"><span>SPX-041</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣□□□□</span></span>
+  <div class="nm">&lt;marquee&gt; (deprecated)</div>
+  <p class="how">The deprecated <code>&lt;marquee&gt;</code> element still parses as an element — its text content is plainly readable.</p>
+  <div class="loc"><b>flag lives in</b><br>Text inside &lt;marquee&gt;.</div>
+</a>
+<a class="card" href="pages/conditional-comments.html">
+  <span class="id"><span>SPX-042</span><span class="era legacy">Legacy</span>
+    <span class="meter">▣▣□□□</span></span>
+  <div class="nm">IE conditional comment</div>
+  <p class="how">An IE conditional comment (<code>&lt;!--[if IE]&gt;…&lt;![endif]--&gt;</code>) hides markup from modern renderers, but it stays in the source.</p>
+  <div class="loc"><b>flag lives in</b><br>Inside &lt;!--[if IE]&gt; ... &lt;![endif]--&gt;.</div>
+</a></div>
+</section><section class="cat">
+  <h2>Behaviour</h2>
+  <p class="cat-sub">value appears only after pagination, scrolling, or in headers/URLs · 4 specimens</p>
+  <div class="grid"><a class="card" href="pages/pagination-1.html">
+  <span class="id"><span>SPX-043</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣□□</span></span>
+  <div class="nm">Pagination (multi-page)</div>
+  <p class="how">Results are split across pages and the value appears only on the last page, so you must follow the <em>next</em> links to reach it.</p>
+  <div class="loc"><b>flag lives in</b><br>pagination-3.html (follow next links)</div>
+</a>
+<a class="card" href="pages/lazy-load.html">
+  <span class="id"><span>SPX-044</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣▣□</span></span>
+  <div class="nm">Lazy-loaded on scroll</div>
+  <p class="how">An IntersectionObserver fills the slot only when it scrolls into view. Drive a browser to scroll, or read the script that holds the value.</p>
+  <div class="loc"><b>flag lives in</b><br>#lazy textContent after it scrolls into view.</div>
+</a>
+<a class="card" href="pages/url-fragment.html">
+  <span class="id"><span>SPX-045</span><span class="era modern">Modern</span>
+    <span class="meter">▣▣▣□□</span></span>
+  <div class="nm">URL fragment (#hash)</div>
+  <p class="how">The value rides in the URL hash (<code>#token=…</code>), resolved purely client-side and never sent to the server.</p>
+  <div class="loc"><b>flag lives in</b><br>#token= fragment in the URL / location.hash.</div>
+</a>
+<a class="card" href="pages/http-header.html">
+  <span class="id"><span>SPX-046</span><span class="era modern">Modern</span><span class="srv">needs server</span>
+    <span class="meter">▣▣▣▣□</span></span>
+  <div class="nm">HTTP response header</div>
+  <p class="how">The value travels in a custom HTTP response header (<code>X-Access-Token</code>), never in the HTML. Inspect the response headers.</p>
+  <div class="loc"><b>flag lives in</b><br>X-Access-Token response header (via serve.py).</div>
+</a></div>
+</section>
+</main>
+<footer class="wrap">the extraction range · 46 specimens · answer key in manifest.json · run serve.py for storage &amp; header specimens</footer>
+</body>
+</html>

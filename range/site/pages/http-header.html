@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HTTP response header · The Extraction Range</title>
+<link rel="stylesheet" href="../assets/style.css">
+
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <span class="mark">THE&nbsp;EXTRACTION&nbsp;<b>RANGE</b></span>
+  <nav><a href="../index.html">↩ catalogue</a></nav>
+</div></header>
+<main class="wrap sheet">
+  <p class="crumb"><a href="../index.html">catalogue</a> / Behaviour / <span class="mono">http-header</span></p>
+  <section class="specimen-head">
+    <div class="top">
+      <span class="tag modern">Modern</span>
+      <span>Behaviour</span>
+      <span>difficulty <b class="mono" style="color:#C8501E">▣▣▣▣□</b></span>
+      <span class="tag" style="background:#C8501E;color:#fff;border-color:#C8501E">needs local server</span>
+    </div>
+    <h1>HTTP response header</h1>
+    <p class="sub">The value never touches the HTML — it travels in a custom response header.</p>
+  </section>
+<div class="note-srv">⚠ True response headers require a server. The included serve.py emits this header so you can test it for real.</div><div class="body-copy"><p>Servers can return values in custom HTTP response headers (<code>X-Access-Token</code>), set cookies via <code>Set-Cookie</code>, or expose data in <code>Link</code> / <code>ETag</code> headers — none of which appear in the HTML body.</p><p>When you load this page through the bundled <code>serve.py</code>, the response carries:</p><pre class="mono" style="background:var(--panel);border:1.5px solid var(--ink);padding:12px;overflow:auto">HTTP/1.0 200 OK
+Content-Type: text/html
+X-Access-Token: FLAG{http-header-DADBF6EF}</pre></div><div class="howto"><b>how to extract</b>Inspect the HTTP response headers (e.g. <code>fetch(url).then(r =&gt; r.headers.get('X-Access-Token'))</code> or <code>curl -I</code>). The bundled server attaches the header to this page.</div>
+</main>
+<footer class="wrap">SPECIMEN HTTP-HEADER · the extraction range · a scraper proving ground</footer>
+</body>
+</html>
