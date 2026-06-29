@@ -17,14 +17,14 @@ much coverage they achieve, and what the PoW costs them.
             host :8000
                 │
                 ▼
-        ┌───────────────┐        ┌──────────────────┐
-        │    anubis      │  proxy │      range        │
-        │  PoW proxy     ├───────►│  mock target site │
-        │  (public)      │        │  (internal only)  │
-        └───────▲────────┘        └──────────────────┘
+        ┌────────────────┐        ┌───────────────────┐
+        │     anubis     │  proxy │      range        │
+        │   PoW proxy    ├───────►│  mock target site │
+        │    (public)    │        │  (internal only)  │
+        └───────▲────────┘        └───────────────────┘
                 │ challenged traffic
         ┌───────┴────────┐
-        │    scrapers     │  bs4 · selenium · scrapy+playwright
+        │    scrapers    │  bs4 · selenium · scrapy+playwright
         └────────────────┘
 ```
 
@@ -123,6 +123,10 @@ All Anubis knobs live in `docker-compose.yml` (env) and `anubis/policies.yaml`.
   crawl costs about the same as one page (amortized). The `COOKIE_EXPIRATION_TIME=1s`
   and `--isolated` modes show the opposite extreme — a stateless/distributed scraper
   paying the PoW on every request.
+
+## Use of AI
+
+AI was used to help the owner create the website, generate the scrapers and document the code.
 
 ## Layout
 
